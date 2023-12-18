@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.Integration;
+using Accord.Math.Integration;
 
 namespace OilModel.Lib
 {
     public class DataService
     {
-        public int[,] ZHoles(int N)
+        public int[] ZHoles(int N)
         {
-            int[,] matrixZ = new int[1, N];
+            int[] matrixZ = new int[N];
 
             for (int i = 0; i < N; i++)
             {
-                matrixZ[0, i] = 5;
+                matrixZ[i] = 5;
             }
             return matrixZ;
         }
 
-        public int[,] XHoles(int N, int L)
+        public int[] XHoles(int N, int L)
         {
-            int[,] matrixX = new int[1, N];
+            int[] matrixX = new int[N];
             int value = 0;
 
             for (int i = N / L; i <= L; i++)
             {
-                matrixX[0, i - 1] = value;
+                matrixX[i - 1] = value;
                 value++;
             }
             return matrixX;
@@ -36,7 +38,7 @@ namespace OilModel.Lib
         {
             double[,] matrixBarrelP = new double[1, N];
             double convertToPascalPlateP = plateP * Math.Pow(10.0, 6);
-            double convertToPascalBottomholeP = Math.Round(bottomholeP * 0.10133) * Math.Pow(10.0, 6);
+            double convertToPascalBottomholeP = /*Math.Round(bottomholeP * 0.10133)*/bottomholeP * Math.Pow(10.0, 6);
 
             for (int i = 0; i < N; i++)
             {
@@ -56,42 +58,99 @@ namespace OilModel.Lib
             return Math.Round(flowRate, 6);
         }
 
-        public double[,] unknownСoefficients(int N, int L, double M, double Kh, double Kv, int h, double Rc)
+        public double[,] unknownСoefficients(int N, int L, double M, double Kh, double Kv, int h, double Rc, double Rk)
         {
             double[,] matrixUnknownCoeff = new double[N, N];
-            int[,] matrixZ = ZHoles(N);
-            int[,] matrixX = XHoles(N, L);
+            int[] matrixZ = ZHoles(N);
+            int[] matrixX = XHoles(N, L);
+            //double result = 0;
+            //double integral = 0;
+            //double composite;
+
+            //Console.WriteLine(matrixZ[0]);
 
             for (int i = 0; i < N; i++)
             {
                 for (int j = 0; j < N; j++)
                 {
+                    for (int n = -100; n <= 100; n++)
+                    {
+                        double f(double x) => Math.Pow(Math.Sqrt(Xh(Kh, Kv) * Math.Pow((matrixX[i] - (L / (2 * N))) - x, 2) + Xh(Kh, Kv) * Math.Pow(Rc, 2) + Xv(Kh, Kv) * Math.Pow(matrixZ[i] - matrixZ[j] + 2 * n * h, 2)), -1) +
+                            Math.Pow(Math.Sqrt(Xh(Kh, Kv) * Math.Pow((matrixX[i] - (L / (2 * N))) - x, 2) + Xh(Kh, Kv) * Math.Pow(Rc, 2) + Xv(Kh, Kv) * Math.Pow(matrixZ[i] + matrixZ[j] + 2 * n * h, 2)), -1) -
+                            Math.Pow(Math.Sqrt(Math.Pow(Xh(Kh, Kv) * Rk, 2) + Xv(Kh, Kv) * Math.Pow(matrixZ[i] - matrixZ[j] + 2 * n * h, 2)), -1) - Math.Pow(Math.Sqrt(Math.Pow(Xh(Kh, Kv) * Rk, 2) + Xv(Kh, Kv) * Math.Pow(matrixZ[i] + matrixZ[j] + 2 * n * h, 2)), -1);
+                        //composite = GaussLegendreRule.Integrate(f, Convert.ToDouble(matrixX[j] + 1), Convert.ToDouble(matrixX[j]), N);
 
+                        RombergMethod rm = new RombergMethod();
+                        double result = RombergMethod.Integrate(f, Convert.ToDouble(matrixX[j] + 1), Convert.ToDouble(matrixX[j]));
+
+                        matrixUnknownCoeff[i, j] = (M / (4 * Math.PI * Keq(Kh, Kv))) * Math.Pow(L / N, -1) * result;
+                    }
                 }
             }
 
             return matrixUnknownCoeff;
         }
 
-        private static double Simpson(Func<double, double> f, double a, double b, int n)
+        public double[,] extendedArray(double[,] matrixUnknownCoeff, double[,] matrixBarrelP, int N)
         {
-            var h = (b - a) / n;
-            var sum1 = 0d;
-            var sum2 = 0d;
-            for (var k = -100; k <= n; k++)
-            {
-                var xk = a + k * h;
-                if (k <= n - 1)
-                {
-                    sum1 += f(xk);
-                }
+            double[,] extendedArray = new double[N, N + 1];
 
-                var xk_1 = a + (k - 1) * h;
-                sum2 += f((xk + xk_1) / 2);
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    extendedArray[i, j] = matrixUnknownCoeff[i, j];
+                }
+            }
+            for (int i = 0; i < N; i++)
+            {
+                extendedArray[i, N] = matrixBarrelP[0, i];
+            }
+            return extendedArray;
+        }
+        public double[] Gauss(double[,] Matrix)
+        {
+            int n = Matrix.GetLength(0); //Размерность начальной матрицы (строки)
+            double[,] Matrix_Clone = new double[n, n + 1]; //Матрица-дублер
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n + 1; j++)
+                    Matrix_Clone[i, j] = Matrix[i, j];
+
+            // Прямой ход (Зануление нижнего левого угла)
+            for (int k = 0; k < n; k++) //k-номер строки
+            {
+                for (int i = 0; i < n + 1; i++) //i-номер столбца
+                    Matrix_Clone[k, i] = Matrix_Clone[k, i] / Matrix[k, k]; //Деление k-строки на первый член !=0 для преобразования его в единицу
+                for (int i = k + 1; i < n; i++) //i-номер следующей строки после k
+                {
+                    double K = Matrix_Clone[i, k] / Matrix_Clone[k, k]; //Коэффициент
+                    for (int j = 0; j < n + 1; j++) //j-номер столбца следующей строки после k
+                        Matrix_Clone[i, j] = Matrix_Clone[i, j] - Matrix_Clone[k, j] * K; //Зануление элементов матрицы ниже первого члена, преобразованного в единицу
+                }
+                for (int i = 0; i < n; i++) //Обновление, внесение изменений в начальную матрицу
+                    for (int j = 0; j < n + 1; j++)
+                        Matrix[i, j] = Matrix_Clone[i, j];
             }
 
-            var result = h / 3d * (1d / 2d * f(a) + sum1 + 2 * sum2 + 1d / 2d * f(b));
-            return result;
+            // Обратный ход (Зануление верхнего правого угла)
+            for (int k = n - 1; k > -1; k--) //k-номер строки
+            {
+                for (int i = n; i > -1; i--) //i-номер столбца
+                    Matrix_Clone[k, i] = Matrix_Clone[k, i] / Matrix[k, k];
+                for (int i = k - 1; i > -1; i--) //i-номер следующей строки после k
+                {
+                    double K = Matrix_Clone[i, k] / Matrix_Clone[k, k];
+                    for (int j = n; j > -1; j--) //j-номер столбца следующей строки после k
+                        Matrix_Clone[i, j] = Matrix_Clone[i, j] - Matrix_Clone[k, j] * K;
+                }
+            }
+
+            // Отделяем от общей матрицы ответы
+            double[] Answer = new double[n];
+            for (int i = 0; i < n; i++)
+                Answer[i] = Matrix_Clone[i, n];
+
+            return Answer;
         }
 
         private static double Keq(double Kh, double Kv)

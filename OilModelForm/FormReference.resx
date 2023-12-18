@@ -117,26 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="ris3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ris3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="textBox3.Text" xml:space="preserve">
+    <value>Разделяя траекторию ствола длиной L на N равных участков конечной длины l, преобразуем выражение для потерь депрессии в пласте, вызванных интерференцией. Пусть x— вектор координат концов участков, x = (x0, L/N..N), тогда снижение пластового давления для j-го участка ствола на единицу длины определятся как
+</value>
   </data>
-  <data name="ris" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ris.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="textBox2.Text" xml:space="preserve">
+    <value>Представим элементарный участок ствола dl точечным стоком, к которому идет радиально-сферический приток. Тогда горизонтальный участок конечной длины с координатами концов х1 и х2 является линией стоков. В таком случае выражение для потенциала, вызванного работой линии стоков (х1- х2) примет вид
+</value>
   </data>
-  <data name="pngegg" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\pngegg.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="accept" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\accept.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="logo_oil" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\logo_oil.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ris2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ris2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ris4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ris4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="textBox1.Text" xml:space="preserve">
+    <value>Многими исследователями отмечается, что приток к горизонтальному стволу нефтяной скважины имеет U-образную форму, то есть дебит участков в середине горизонтального ствола ниже, чем на его концах. Знание дебита отдельных участков, позволяет оценить влияние интерференции на другие участки ствола с учетом расстояния между участками и их производительности, поэтому, остается невозможным использование аналитических формул в условиях работы системы нескольких стволов, таких как скважина с забуренным боковым стволом, боковым стволом с горизонтальным участком, для многоствольной, для многозабойных вертикальных, многозабойных горизонтальных и других скважин сложной архитектуры.
+Для решения описанной выше задачи разобьем открытый ствол на множество участков, длина каждого из которых много меньше длины ствола, и определим дебит каждого участка с учетом его интерференции с остальными. Рассмотрим горизонтальный открытый ствол нефтяной скважины. К элементарному участку ствола dl идет приток жидкости dQ из пласта и смешивается с потоком Q, движущемся в стволе скважины.
+</value>
   </data>
 </root>
